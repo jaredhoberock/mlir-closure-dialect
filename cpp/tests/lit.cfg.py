@@ -10,4 +10,6 @@ closure_plugin_path = os.path.join(os.path.dirname(__file__), '..', 'libclosure_
 tuple_plugin_path = os.path.join(os.path.dirname(__file__), '/home/jhoberock/dev/git/mlir-tuple-dialect/cpp', 'libtuple_dialect.so')
 trait_plugin_path = os.path.join(os.path.dirname(__file__), '/home/jhoberock/dev/git/mlir-trait-dialect/cpp', 'libtrait_dialect.so')
 
-config.substitutions.append(('mlir-opt', f'mlir-opt --load-dialect-plugin={trait_plugin_path} --load-dialect-plugin={tuple_plugin_path} --load-dialect-plugin={closure_plugin_path}'))
+llvm_bin = os.path.join(os.path.expanduser("~"), "dev/git/llvm-project-22/build/bin")
+mlir_opt = os.path.join(llvm_bin, "mlir-opt")
+config.substitutions.append(('mlir-opt', f'{mlir_opt} --load-dialect-plugin={trait_plugin_path} --load-dialect-plugin={tuple_plugin_path} --load-dialect-plugin={closure_plugin_path}'))

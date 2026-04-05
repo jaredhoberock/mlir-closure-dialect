@@ -1,4 +1,4 @@
-LLVM_BIN_PATH = /home/jhoberock/dev/git/llvm-project-20/install/bin
+LLVM_BIN_PATH = /home/jhoberock/dev/git/llvm-project-22/install/bin
 
 LLVM_CONFIG := $(LLVM_BIN_PATH)/llvm-config
 TBLGEN := $(LLVM_BIN_PATH)/mlir-tblgen
@@ -9,7 +9,7 @@ CXX := clang++
 CXXFLAGS := -Wall -Werror -g -fPIC `$(LLVM_CONFIG) --cxxflags`
 
 # LLVM/MLIR libraries
-MLIR_INCLUDE = /home/jhoberock/dev/git/llvm-project-20/install/include
+MLIR_INCLUDE = /home/jhoberock/dev/git/llvm-project-22/install/include
 
 # Trait dialect include
 TRAIT_DIALECT_INCLUDE = $(HOME)/dev/git/mlir-trait-dialect/cpp

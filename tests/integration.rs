@@ -6,6 +6,7 @@ use melior::{
         attribute::{IntegerAttribute, StringAttribute, TypeAttribute},
         Attribute,
         r#type::{FunctionType, IntegerType},
+        operation::{OperationLike, OperationMutLike},
         Block, BlockLike, Location, Module, Operation, Region, RegionLike,
     },
     pass::{self, PassManager},
@@ -92,7 +93,7 @@ fn test_closure_jit() {
     assert!(pass_manager.run(&mut module).is_ok());
 
     // JIT compile the module
-    let engine = ExecutionEngine::new(&module, 0, &[], false);
+    let engine = ExecutionEngine::new(&module, 0, &[], false, false);
 
     // test
     unsafe {

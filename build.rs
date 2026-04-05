@@ -24,6 +24,15 @@ fn main() {
     println!("cargo:rustc-link-search=native={}", cpp_dir.display());
     println!("cargo:rustc-link-lib=static=closure_dialect");
 
+    // Also need tuple and trait dialect symbols (referenced by closure's C++ code)
+    let tuple_cpp_dir = crate_dir.join("../mlir-tuple-dialect/cpp");
+    println!("cargo:rustc-link-search=native={}", tuple_cpp_dir.display());
+    println!("cargo:rustc-link-lib=static=tuple_dialect");
+
+    let trait_cpp_dir = crate_dir.join("../mlir-trait-dialect/cpp");
+    println!("cargo:rustc-link-search=native={}", trait_cpp_dir.display());
+    println!("cargo:rustc-link-lib=static=trait_dialect");
+
     // Ensure rebuild if anything in cpp/ changes
     println!("cargo:rerun-if-changed=cpp/");
 }

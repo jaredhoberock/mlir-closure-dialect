@@ -83,7 +83,7 @@ struct CallOpLowering : public OpConversionPattern<CallOp> {
       OpBuilder::InsertionGuard guard(rewriter);
       rewriter.setInsertionPointToStart(module.getBody());
 
-      func = rewriter.create<func::FuncOp>(loc, funcName, funcTy);
+      func = func::FuncOp::create(rewriter, loc, funcName, funcTy);
       func.setPrivate();
     } else {
       // the existing type must match what this call implies.
@@ -144,7 +144,7 @@ struct MakeOpLowering : public OpConversionPattern<MakeOp> {
       // create the hoisted func.func at module scope
       OpBuilder::InsertionGuard guard(rewriter);
       rewriter.setInsertionPointToStart(module.getBody());
-      func = rewriter.create<func::FuncOp>(loc, funcName, funcTy);
+      func = func::FuncOp::create(rewriter, loc, funcName, funcTy);
       func.setPrivate();
     } else {
       // if it already exists, ensure the type matches
@@ -194,7 +194,7 @@ struct MakeOpLowering : public OpConversionPattern<MakeOp> {
         OpBuilder::InsertionGuard guard(rewriter);
         rewriter.setInsertionPointToStart(dstEntry);
         for (unsigned i = 0; i < numCaptures; ++i)
-          mapped.push_back(rewriter.create<tuple::GetOp>(loc, env, i));
+          mapped.push_back(tuple::GetOp::create(rewriter, loc, env, i));
       }
 
       // call args = dstEntry args after env

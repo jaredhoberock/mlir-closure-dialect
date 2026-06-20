@@ -225,6 +225,8 @@ version = "0.1.0"
 dependencies = [
  "melior",
  "mlir-sys",
+ "mlir-trait-dialect",
+ "mlir-tuple-dialect",
 ]
 
 [[package]]
@@ -234,6 +236,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cc2e25debeba9206972a9cee0b9cebbde63c15d45318a5cde1e46041b398e1cc"
 dependencies = [
  "bindgen",
+]
+
+[[package]]
+name = "mlir-trait-dialect"
+version = "0.2.0"
+dependencies = [
+ "melior",
+ "mlir-sys",
+]
+
+[[package]]
+name = "mlir-tuple-dialect"
+version = "0.2.0"
+dependencies = [
+ "melior",
+ "mlir-sys",
+ "mlir-trait-dialect",
 ]
 
 [[package]]

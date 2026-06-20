@@ -3,4 +3,4 @@
 #include "mlir/IR/BuiltinTypes.h"
 
 #define GET_TYPEDEF_CLASSES
-#include "ClosureTypes.hpp.inc"
+#include <ClosureTypes.hpp.inc>

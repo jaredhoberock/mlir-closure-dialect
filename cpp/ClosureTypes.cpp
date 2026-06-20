@@ -10,12 +10,12 @@ using namespace mlir;
 using namespace mlir::closure;
 
 #define GET_TYPEDEF_CLASSES
-#include "ClosureTypes.cpp.inc"
+#include <ClosureTypes.cpp.inc>
 
 void ClosureDialect::registerTypes() {
   addTypes<
 #define GET_TYPEDEF_LIST
-#include "ClosureTypes.cpp.inc"
+#include <ClosureTypes.cpp.inc>
   >();
 }
 

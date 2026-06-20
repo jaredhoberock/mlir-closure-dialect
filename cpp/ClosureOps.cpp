@@ -3,7 +3,7 @@
 #include "ClosureTypes.hpp"
 
 #define GET_OP_CLASSES
-#include "ClosureOps.cpp.inc"
+#include <ClosureOps.cpp.inc>
 
 namespace mlir::closure {
 

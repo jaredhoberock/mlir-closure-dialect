@@ -2,11 +2,14 @@
 name = "mlir-closure-dialect"
 version = "0.1.0"
 edition = "2024"
+links = "closure_dialect"
 authors = ["Jared Hoberock <jaredhoberock@gmail.com>"]
 
 [dependencies]
 melior = "0.27"
 mlir-sys = "220.0.1"
+trait_dialect = { path = "../mlir-trait-dialect", package = "mlir-trait-dialect" }
+tuple_dialect = { path = "../mlir-tuple-dialect", package = "mlir-tuple-dialect" }
 
 [lib]
 name = "closure_dialect"

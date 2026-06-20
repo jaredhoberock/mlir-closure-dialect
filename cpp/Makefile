@@ -2,74 +2,68 @@ ifndef MLIR_SYS_220_PREFIX
 $(error MLIR_SYS_220_PREFIX must be set; point it at your LLVM/MLIR 22 install)
 endif
 
+BUILD_DIR := build
+TUPLE_DIALECT_SOURCE_DIR := ../../mlir-tuple-dialect/cpp
+TUPLE_DIALECT_INCLUDE_DIR := ../../mlir-tuple-dialect/cpp/build
+TRAIT_DIALECT_SOURCE_DIR := ../../mlir-trait-dialect/cpp
+TRAIT_DIALECT_INCLUDE_DIR := ../../mlir-trait-dialect/cpp/build
 LLVM_BIN_PATH := $(MLIR_SYS_220_PREFIX)/bin
-
 LLVM_CONFIG := $(LLVM_BIN_PATH)/llvm-config
 TBLGEN := $(LLVM_BIN_PATH)/mlir-tblgen
-OPT := $(LLVM_BIN_PATH)/mlir-opt
 
-# Compiler flags
 CXX := clang++
-CXXFLAGS := -Wall -Werror -g -fPIC `$(LLVM_CONFIG) --cxxflags`
+CXXFLAGS := -Wall -Werror -fPIC $(shell $(LLVM_CONFIG) --cxxflags)
+INCLUDES := -I$(BUILD_DIR) -I. -I$(MLIR_SYS_220_PREFIX)/include -I$(TUPLE_DIALECT_SOURCE_DIR) -I$(TUPLE_DIALECT_INCLUDE_DIR) -I$(TRAIT_DIALECT_SOURCE_DIR) -I$(TRAIT_DIALECT_INCLUDE_DIR)
 
-# LLVM/MLIR libraries
-MLIR_INCLUDE := $(MLIR_SYS_220_PREFIX)/include
-
-# Trait dialect include
-TRAIT_DIALECT_INCLUDE = ../../mlir-trait-dialect/cpp
-
-# Tuple dialect include
-TUPLE_DIALECT_INCLUDE = ../../mlir-tuple-dialect/cpp
-
-INCLUDES := -I $(MLIR_INCLUDE) -I $(TRAIT_DIALECT_INCLUDE) -I $(TUPLE_DIALECT_INCLUDE)
-
-# Dialect library sources
 DIALECT_SOURCES := c_api.cpp Closure.cpp ClosureOps.cpp ClosureTypes.cpp ConvertToFuncAndTuple.cpp
-DIALECT_OBJECTS := $(DIALECT_SOURCES:.cpp=.o)
+DIALECT_OBJECTS := $(addprefix $(BUILD_DIR)/,$(DIALECT_SOURCES:.cpp=.o))
+PLUGIN_OBJECTS := $(DIALECT_OBJECTS) $(BUILD_DIR)/Plugin.o
+TD_FILES := $(wildcard *.td)
 
-# Generated files
-GENERATED := Closure.hpp.inc Closure.cpp.inc ClosureOps.hpp.inc ClosureOps.cpp.inc ClosureTypes.hpp.inc ClosureTypes.cpp.inc
+GENERATED := \
+  $(BUILD_DIR)/Closure.hpp.inc \
+  $(BUILD_DIR)/Closure.cpp.inc \
+  $(BUILD_DIR)/ClosureOps.hpp.inc \
+  $(BUILD_DIR)/ClosureOps.cpp.inc \
+  $(BUILD_DIR)/ClosureTypes.hpp.inc \
+  $(BUILD_DIR)/ClosureTypes.cpp.inc
 
-.PHONY: all clean
+.PHONY: all clean test
 
-all: libclosure_dialect.a libclosure_dialect.so
+all: $(BUILD_DIR)/libclosure_dialect.a $(BUILD_DIR)/libclosure_dialect.so
 
-# TableGen rules
-Closure.hpp.inc: Closure.td
+$(BUILD_DIR):
+	mkdir -p $@
+
+$(BUILD_DIR)/Closure.hpp.inc: Closure.td $(TD_FILES) | $(BUILD_DIR)
 	$(TBLGEN) --gen-dialect-decls $(INCLUDES) $< -o $@
 
-Closure.cpp.inc: Closure.td
+$(BUILD_DIR)/Closure.cpp.inc: Closure.td $(TD_FILES) | $(BUILD_DIR)
 	$(TBLGEN) --gen-dialect-defs $(INCLUDES) $< -o $@
 
-ClosureOps.hpp.inc: ClosureOps.td
+$(BUILD_DIR)/ClosureOps.hpp.inc: ClosureOps.td $(TD_FILES) | $(BUILD_DIR)
 	$(TBLGEN) --gen-op-decls $(INCLUDES) $< -o $@
 
-ClosureOps.cpp.inc: ClosureOps.td
+$(BUILD_DIR)/ClosureOps.cpp.inc: ClosureOps.td $(TD_FILES) | $(BUILD_DIR)
 	$(TBLGEN) --gen-op-defs $(INCLUDES) $< -o $@
 
-ClosureTypes.hpp.inc: ClosureTypes.td
+$(BUILD_DIR)/ClosureTypes.hpp.inc: ClosureTypes.td $(TD_FILES) | $(BUILD_DIR)
 	$(TBLGEN) --gen-typedef-decls $(INCLUDES) $< -o $@
 
-ClosureTypes.cpp.inc: ClosureTypes.td
+$(BUILD_DIR)/ClosureTypes.cpp.inc: ClosureTypes.td $(TD_FILES) | $(BUILD_DIR)
 	$(TBLGEN) --gen-typedef-defs $(INCLUDES) $< -o $@
 
-# Object file rules
-%.o: %.cpp $(GENERATED)
+$(BUILD_DIR)/%.o: %.cpp $(GENERATED) | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
-libclosure_dialect.a: $(DIALECT_OBJECTS)
+$(BUILD_DIR)/libclosure_dialect.a: $(DIALECT_OBJECTS)
 	ar rcs $@ $^
 
-PLUGIN_OBJECTS := $(DIALECT_OBJECTS) Plugin.o
-
-libclosure_dialect.so: $(PLUGIN_OBJECTS)
+$(BUILD_DIR)/libclosure_dialect.so: $(PLUGIN_OBJECTS)
 	$(CXX) -shared $^ -o $@
 
-.PHONY: test
-test: libclosure_dialect.so
-	@echo "Running closure dialect tests..."
-	lit tests
+test: $(BUILD_DIR)/libclosure_dialect.so
+	CLOSURE_DIALECT_PLUGIN=$(CURDIR)/$(BUILD_DIR)/libclosure_dialect.so lit tests
 
 clean:
-	rm -f *.o *.inc *.a *.so
-
+	rm -rf $(BUILD_DIR)

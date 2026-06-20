@@ -5,4 +5,4 @@
 #include <mlir/Interfaces/ControlFlowInterfaces.h>
 
 #define GET_OP_CLASSES
-#include "ClosureOps.hpp.inc"
+#include <ClosureOps.hpp.inc>

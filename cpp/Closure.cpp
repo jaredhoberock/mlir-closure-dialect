@@ -5,14 +5,14 @@
 #include <mlir/Dialect/Func/IR/FuncOps.h>
 #include <Tuple.hpp>
 
-#include "Closure.cpp.inc"
+#include <Closure.cpp.inc>
 
 namespace mlir::closure {
 
 void ClosureDialect::initialize() {
   addOperations<
 #define GET_OP_LIST
-#include "ClosureOps.cpp.inc"
+#include <ClosureOps.cpp.inc>
   >();
 
   registerTypes();
